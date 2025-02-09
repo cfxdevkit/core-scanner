@@ -5,12 +5,7 @@ export { CoreApi, CoreScanner } from "./core";
 export { CoreScannerWrapper } from "./wrapper";
 
 // Types
-export {
-  ApiConfig,
-  ApiResponse,
-  FormattedResponse,
-  ConfluxTarget,
-} from "./types/api";
+export { ApiConfig, ApiResponse, FormattedResponse, ConfluxTarget } from "./types/api";
 
 export {
   ContractABIData,

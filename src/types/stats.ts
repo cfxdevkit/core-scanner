@@ -1,4 +1,4 @@
-export interface ESpaceStatItem {
+export interface CoreStatItem {
   statTime: string;
   count?: number;
   holderCount?: number;
@@ -11,7 +11,7 @@ export interface ESpaceStatItem {
   gasUsed?: string;
 }
 
-export interface ESpaceTopStatsResponse {
+export interface CoreTopStatsResponse {
   gasTotal?: string;
   valueTotal?: string;
   maxTime?: string;

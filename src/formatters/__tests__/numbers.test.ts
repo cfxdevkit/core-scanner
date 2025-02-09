@@ -1,18 +1,18 @@
 import { NumberFormatter } from "../numbers";
-import { formatEther, formatUnits } from "viem";
+import { formatCFX, formatUnits } from "cive";
 
-jest.mock("viem", () => ({
-  formatEther: jest.fn(),
+jest.mock("cive", () => ({
+  formatCFX: jest.fn(),
   formatUnits: jest.fn(),
 }));
 
 describe("NumberFormatter", () => {
-  const MockedFormatEther = formatEther as jest.MockedFunction<typeof formatEther>;
+  const MockedformatCFX = formatCFX as jest.MockedFunction<typeof formatCFX>;
   const MockedFormatUnits = formatUnits as jest.MockedFunction<typeof formatUnits>;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    MockedFormatEther.mockReturnValue("1.0");
+    MockedformatCFX.mockReturnValue("1.0");
     MockedFormatUnits.mockReturnValue("1.0");
   });
 
@@ -74,12 +74,12 @@ describe("NumberFormatter", () => {
 
   describe("formatCFX", () => {
     it("should format CFX value", () => {
-      MockedFormatEther.mockReturnValue("1.5");
+      MockedformatCFX.mockReturnValue("1.5");
       expect(NumberFormatter.formatCFX("1500000000000000000")).toBe("1.5 CFX");
     });
 
     it("should handle scientific notation", () => {
-      MockedFormatEther.mockReturnValue("1.5");
+      MockedformatCFX.mockReturnValue("1.5");
       expect(NumberFormatter.formatCFX(1.5e18)).toBe("1.5 CFX");
     });
 
@@ -104,12 +104,12 @@ describe("NumberFormatter", () => {
     });
 
     it("should format CFX amount", () => {
-      MockedFormatEther.mockReturnValue("1.5");
+      MockedformatCFX.mockReturnValue("1.5");
       expect(NumberFormatter.formatTokenAmount("1500000000000000000", 18, true)).toBe("1.5 CFX");
     });
 
     it("should handle scientific notation for CFX", () => {
-      MockedFormatEther.mockReturnValue("1.5");
+      MockedformatCFX.mockReturnValue("1.5");
       expect(NumberFormatter.formatTokenAmount(1.5e18, 18, true)).toBe("1.5 CFX");
     });
 

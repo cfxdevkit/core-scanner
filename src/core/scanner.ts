@@ -81,7 +81,9 @@ export class CoreScanner extends CoreApi {
     return response.data.list;
   }
 
-  async getTokenInfos(params: { contracts?: string | string[]; skip?: number; limit?: number } = {}) {
+  async getTokenInfos(
+    params: { contracts?: string | string[]; skip?: number; limit?: number } = {}
+  ) {
     const { contracts, ...paginationParams } = params;
     const contractList = Array.isArray(contracts) ? contracts.join(",") : contracts;
 
@@ -157,11 +159,17 @@ export class CoreScanner extends CoreApi {
   }
 
   async getTopTransactionSenders(spanType: StatsPeriod = "24h") {
-    return this.getTopStats<ListResponse<TopStatsItem>>("/statistics/top/transaction/sender", spanType);
+    return this.getTopStats<ListResponse<TopStatsItem>>(
+      "/statistics/top/transaction/sender",
+      spanType
+    );
   }
 
   async getTopTransactionReceivers(spanType: StatsPeriod = "24h") {
-    return this.getTopStats<ListResponse<StatItem>>("/statistics/top/transaction/receiver", spanType);
+    return this.getTopStats<ListResponse<StatItem>>(
+      "/statistics/top/transaction/receiver",
+      spanType
+    );
   }
 
   async getTopCfxSenders(spanType: StatsPeriod = "24h") {

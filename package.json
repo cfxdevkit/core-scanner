@@ -1,7 +1,7 @@
 {
-  "name": "@cfxdevkit/confluxscan-espace",
+  "name": "@cfxdevkit/confluxscan-core",
   "version": "0.1.4",
-  "description": "A TypeScript library for interacting with Conflux eSpace Scanner API",
+  "description": "A TypeScript library for interacting with Conflux Confluxscan API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -33,7 +33,7 @@
   },
   "keywords": [
     "conflux",
-    "espace",
+    "core",
     "blockchain",
     "scanner",
     "api",
@@ -43,12 +43,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cfxdevkit/espace-scanner.git"
+    "url": "git+https://github.com/cfxdevkit/core-scanner.git"
   },
   "bugs": {
-    "url": "https://github.com/cfxdevkit/espace-scanner/issues"
+    "url": "https://github.com/cfxdevkit/core-scanner/issues"
   },
-  "homepage": "https://cfxdevkit.github.io/espace-scanner",
+  "homepage": "https://cfxdevkit.github.io/core-scanner",
   "dependencies": {
     "cive": "^0.8.1",
     "pino": "^8.19.0",

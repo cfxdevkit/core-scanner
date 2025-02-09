@@ -54,4 +54,29 @@ describe("DateFormatter", () => {
       expect(result).toBe(1707307200 - Math.floor(0.5 * 24 * 60 * 60));
     });
   });
+
+  describe("edge cases", () => {
+    it("should handle invalid timestamps", () => {
+      expect(DateFormatter.formatTimestamp("")).toBe("N/A");
+      expect(DateFormatter.formatTimestamp("invalid")).toBe("N/A");
+      expect(DateFormatter.formatTimestamp("2024-13-45")).toBe("N/A"); // Invalid date
+    });
+
+    it("should handle different timestamp formats", () => {
+      const now = Date.now();
+      expect(DateFormatter.formatTimestamp(now)).toBeDefined();
+      expect(DateFormatter.formatTimestamp(now / 1000)).toBeDefined();
+      expect(DateFormatter.formatTimestamp(String(now))).toBeDefined();
+    });
+
+    it("should handle timestamp conversion edge cases", () => {
+      const now = Date.now();
+      const minTimestamp = 0;
+      const maxTimestamp = 8640000000000; // Maximum valid JS timestamp
+
+      expect(DateFormatter.formatTimestamp(minTimestamp)).toBeDefined();
+      expect(DateFormatter.formatTimestamp(maxTimestamp)).toBeDefined();
+      expect(DateFormatter.formatTimestamp(Math.floor(now / 1000))).toBeDefined();
+    });
+  });
 });

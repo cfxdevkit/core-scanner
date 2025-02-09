@@ -49,7 +49,7 @@ export interface TokenListResponse {
 export interface StatItem {
   statTime: string | number;
   count: string | number;
-  [key: string]: string | number;
+  [key: string]: string | number | undefined;
 }
 
 export interface ContractStatItem extends StatItem {
@@ -78,7 +78,7 @@ export interface TopValueItem {
   value: string | number;
 }
 
-export interface ESpaceStatItem {
+export interface CoreStatItem {
   statTime: string | number;
   [key: string]: string | number;
 }
@@ -90,7 +90,7 @@ export interface TopStatsItem extends StatItem {
   transferCntr?: string | number;
 }
 
-export interface ESpaceTopStatsResponse {
+export interface CoreTopStatsResponse {
   gasTotal?: string;
   valueTotal?: string | number;
   maxTime?: string;
@@ -100,7 +100,7 @@ export interface ESpaceTopStatsResponse {
 
 export interface ESpaceStatsResponse {
   total: number;
-  list: ESpaceStatItem[];
+  list: CoreStatItem[];
   intervalType?: string;
 }
 

@@ -1,7 +1,7 @@
 import { NumberFormatter } from "./numbers";
 import { DateFormatter } from "./dates";
-import { TokenData, ESpaceStatItem, ESpaceTopStatsResponse, FormattedResponse } from "../types";
-import { formatUnits } from "viem";
+import { TokenData, CoreStatItem, CoreTopStatsResponse, FormattedResponse } from "../types";
+import { formatUnits } from "cive";
 
 export class ResponseFormatter {
   static formatUnit(value: string | number | undefined, decimals: number): string {
@@ -21,7 +21,7 @@ export class ResponseFormatter {
 
   static formatCFX(value: string | number | undefined): string {
     if (value === undefined) return "0";
-    return NumberFormatter.formatNumber(value);
+    return NumberFormatter.formatCFX(value);
   }
 
   static formatTimestamp(value: string | number | undefined): string {
@@ -40,7 +40,7 @@ export class ResponseFormatter {
     return lines.join("\n");
   }
 
-  static formatStatItem(item: ESpaceStatItem): string {
+  static formatStatItem(item: CoreStatItem): string {
     const formattedTime = DateFormatter.formatTimestamp(item.statTime);
     const entries = Object.entries(item)
       .filter(([key]) => key !== "statTime")
@@ -49,7 +49,7 @@ export class ResponseFormatter {
     return [`Time: ${formattedTime}`, ...entries].join("\n");
   }
 
-  static formatTopStats(data: ESpaceTopStatsResponse): string {
+  static formatTopStats(data: CoreTopStatsResponse): string {
     if (!data?.list?.length) return "No data available";
 
     const lines = [];

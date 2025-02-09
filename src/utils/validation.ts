@@ -25,3 +25,29 @@ export class AddressValidator {
     return isValid;
   }
 }
+
+/**
+ * Validates if a given string is a valid Conflux address
+ */
+export function isValidAddress(address: string): boolean {
+  if (!address || typeof address !== "string") {
+    return false;
+  }
+
+  // Basic Conflux address format check
+  return address.startsWith("cfx:") && address.length >= 42;
+}
+
+/**
+ * Validates timestamp range parameters
+ */
+export function validateTimestampRange(params: {
+  minTimestamp?: number;
+  maxTimestamp?: number;
+}): void {
+  const { minTimestamp, maxTimestamp } = params;
+
+  if (minTimestamp && maxTimestamp && minTimestamp > maxTimestamp) {
+    throw new Error("minTimestamp must be less than or equal to maxTimestamp");
+  }
+}

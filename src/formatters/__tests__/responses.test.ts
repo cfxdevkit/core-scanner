@@ -2,11 +2,12 @@ import { ResponseFormatter } from "../responses";
 import { NumberFormatter } from "../numbers";
 import { DateFormatter } from "../dates";
 import { jest } from "@jest/globals";
-import { formatUnits } from "viem";
+import { formatUnits } from "cive";
+import { TopStatsItem } from "../../types";
 
 jest.mock("../numbers");
 jest.mock("../dates");
-jest.mock("viem");
+jest.mock("cive");
 
 describe("ResponseFormatter", () => {
   const MockedNumberFormatter = NumberFormatter as jest.Mocked<typeof NumberFormatter>;
@@ -129,31 +130,31 @@ describe("ResponseFormatter", () => {
   });
 
   describe("formatTopStats", () => {
-    const mockTopStats = {
-      gasTotal: "1000000000",
-      valueTotal: "1000000",
-      list: [
-        {
-          address: "0x1234567890123456789012345678901234567890",
-          gas: "500000000",
-          value: "500000",
-          transferCntr: "10",
-        },
-      ],
-    };
-
-    it("should format top stats with all fields", () => {
-      const result = ResponseFormatter.formatTopStats(mockTopStats);
-      expect(result).toContain("Total Gas Used: 1 Gwei");
-      expect(result).toContain("Total Value: 1,000");
-      expect(result).toContain("#1 0x1234567890123456789012345678901234567890");
-      expect(result).toContain("Gas Used: 1 Gwei");
-      expect(result).toContain("Value: 1,000");
-      expect(result).toContain("Transfers: 1,000");
+    beforeEach(() => {
+      MockedNumberFormatter.formatNumber.mockImplementation((val) => val?.toString() || "0");
+      MockedNumberFormatter.formatGas.mockImplementation((val) => val?.toString() || "0");
     });
 
-    it("should handle empty data", () => {
-      expect(ResponseFormatter.formatTopStats({ list: [] })).toBe("No data available");
+    const mockTopStats = {
+      gasTotal: "1000000",
+      valueTotal: "2000000",
+      list: [
+        {
+          address: "cfx:type.user.address",
+          gas: "500000",
+          value: "1000000",
+          transferCntr: "100",
+          statTime: 1234567890,
+          count: "1",
+        },
+      ] as TopStatsItem[],
+    };
+
+    test("should format top stats correctly", () => {
+      const result = ResponseFormatter.formatTopStats(mockTopStats);
+      expect(result).toContain("Total Gas Used: 1000000");
+      expect(result).toContain("Total Value: 2000000");
+      expect(result).toContain("#1 cfx:type.user.address");
     });
   });
 

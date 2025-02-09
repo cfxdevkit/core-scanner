@@ -1,4 +1,4 @@
-import { formatEther, formatUnits } from "viem";
+import { formatCFX, formatUnits } from "cive";
 import { createLogger } from "../utils/logger";
 
 const logger = createLogger("NumberFormatter");
@@ -113,7 +113,7 @@ export class NumberFormatter {
         typeof value === "number"
           ? value.toLocaleString("fullwide", { useGrouping: false })
           : value;
-      const valueInCFX = formatEther(BigInt(normalizedValue));
+      const valueInCFX = formatCFX(BigInt(normalizedValue));
       logger.debug(
         { originalValue: value, normalizedValue, valueInCFX },
         "Successfully formatted CFX value"
@@ -157,7 +157,7 @@ export class NumberFormatter {
         // Handle scientific notation by converting to BigInt first
         const bigAmount =
           typeof amount === "string" ? BigInt(amount) : BigInt(Math.floor(Number(amount)));
-        formatted = formatEther(bigAmount);
+        formatted = formatCFX(bigAmount);
         logger.debug(
           {
             originalAmount: amount,

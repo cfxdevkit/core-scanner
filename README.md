@@ -5,15 +5,15 @@ A TypeScript library for interacting with Conflux eSpace Scanner API.
 ## Installation
 
 ```bash
-npm install @cfxdevkit/confluxscan-espace
+npm install @cfxdevkit/confluxscan-core
 # or
-yarn add @cfxdevkit/confluxscan-espace
+yarn add @cfxdevkit/confluxscan-core
 ```
 
 ## Features
 
 - Full TypeScript support with comprehensive type definitions
-- Complete Conflux eSpace Scanner API coverage
+- Complete Conflux core Scanner API coverage
 - Comprehensive data formatting utilities
 - Built-in error handling and address validation
 - Detailed documentation and examples
@@ -24,10 +24,10 @@ yarn add @cfxdevkit/confluxscan-espace
 ## Usage
 
 ```typescript
-import { ESpaceScanner, ESpaceScannerWrapper } from "@cfxdevkit/confluxscan-espace";
+import { CoreScanner, CoreScannerWrapper } from "@cfxdevkit/confluxscan-core";
 
 // Initialize scanner with configuration
-const scanner = new ESpaceScannerWrapper({ 
+const scanner = new CoreScannerWrapper({ 
     target: "mainnet", 
     apiKey: "YOUR_API_KEY" // optional
 });
@@ -41,7 +41,7 @@ console.log(raw); // Raw data
 const stats = await scanner.getTokenHolderStats("0x1234...");
 
 // Use formatters directly
-import { NumberFormatter, DateFormatter } from "@cfxdevkit/confluxscan-espace";
+import { NumberFormatter, DateFormatter } from "@cfxdevkit/confluxscan-core";
 
 // Format CFX amounts
 console.log(NumberFormatter.formatCFX("1000000000000000000")); // "1 CFX"
@@ -148,10 +148,10 @@ Please ensure your PR:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Links
-
-- [GitHub Repository](https://github.com/cfxdevkit/espace-scanner)
-- [Issue Tracker](https://github.com/cfxdevkit/espace-scanner/issues)
-- [Documentation](https://cfxdevkit.github.io/espace-scanner)
+        
+- [GitHub Repository](https://github.com/cfxdevkit/core-scanner)
+- [Issue Tracker](https://github.com/cfxdevkit/core-scanner/issues)
+- [Documentation](https://cfxdevkit.github.io/core-scanner)
 
 ## Support
 

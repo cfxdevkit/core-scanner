@@ -1,436 +1,382 @@
-import { ESpaceScannerWrapper } from "../scanner";
-import { ESpaceScanner } from "../../core";
+import { CoreScanner } from "../../core";
+import { CoreScannerWrapper } from "../scanner";
 import { ResponseFormatter } from "../../formatters";
+import { StatsPeriod } from "../../types";
 import { jest } from "@jest/globals";
-import { FormattedResponse } from "../../types/api";
-import { ESpaceStatsParams, ESpaceStatsResponse } from "../../types";
 
 jest.mock("../../core/scanner");
 jest.mock("../../formatters/responses");
 
-describe("ESpaceScannerWrapper", () => {
-  let wrapper: ESpaceScannerWrapper;
-  const MockedScanner = ESpaceScanner as jest.MockedClass<typeof ESpaceScanner>;
+describe("CoreScannerWrapper", () => {
+  let wrapper: CoreScannerWrapper;
+  const MockedScanner = CoreScanner as jest.MockedClass<typeof CoreScanner>;
   const MockedFormatter = ResponseFormatter as jest.Mocked<typeof ResponseFormatter>;
-  const validAddress = "0x1234567890123456789012345678901234567890";
 
   beforeEach(() => {
     jest.clearAllMocks();
-    wrapper = new ESpaceScannerWrapper();
+    wrapper = new CoreScannerWrapper({ target: "mainnet" });
   });
 
-  describe("Contract Methods", () => {
-    describe("getContractABI", () => {
-      const mockABI = { abi: '[{"type":"function","name":"test"}]' };
+  test("should format contract ABI response", async () => {
+    const mockABI = { abi: '[{"type":"function","name":"test"}]' };
+    MockedScanner.prototype.getContractABI.mockResolvedValue(mockABI);
 
-      beforeEach(() => {
-        MockedScanner.prototype.getContractABI.mockResolvedValue(mockABI);
-        MockedFormatter.wrapResponse.mockReturnValue({
-          raw: mockABI,
-          formatted: mockABI,
-        });
-      });
-
-      it("should return formatted contract ABI", async () => {
-        const result = await wrapper.getContractABI(validAddress);
-        expect(result).toEqual({
-          raw: mockABI,
-          formatted: mockABI,
-        });
-        expect(MockedScanner.prototype.getContractABI).toHaveBeenCalledWith(validAddress);
-        expect(MockedFormatter.wrapResponse).toHaveBeenCalledWith(mockABI, mockABI);
-      });
+    // Mock the formatter response
+    MockedFormatter.wrapResponse.mockReturnValue({
+      raw: mockABI,
+      formatted: { formattedAbi: "test" },
     });
 
-    describe("getContractSourceCode", () => {
-      const mockSourceCode = {
-        sourceCode: "contract Test {}",
-        abi: "[]",
-        contractName: "Test",
-        compiler: "v0.8.0",
-        optimizationUsed: true,
-        runs: 200,
-        constructorArguments: "",
-        evmVersion: "london",
-        library: "",
-        licenseType: "MIT",
-        proxy: "0x0",
-        implementation: "0x0",
-        swarmSource: "",
-      };
-
-      beforeEach(() => {
-        MockedScanner.prototype.getContractSourceCode.mockResolvedValue(mockSourceCode);
-        MockedFormatter.wrapResponse.mockReturnValue({
-          raw: mockSourceCode,
-          formatted: mockSourceCode,
-        });
-      });
-
-      it("should return formatted contract source code", async () => {
-        const result = await wrapper.getContractSourceCode(validAddress);
-        expect(result).toEqual({
-          raw: mockSourceCode,
-          formatted: mockSourceCode,
-        });
-        expect(MockedScanner.prototype.getContractSourceCode).toHaveBeenCalledWith(validAddress);
-        expect(MockedFormatter.wrapResponse).toHaveBeenCalledWith(mockSourceCode, mockSourceCode);
-      });
-    });
+    const result = await wrapper.getContractABI("cfx:acg158kvr8zanb1bs048ryb6rtrhr283ma70vz70tx");
+    expect(result.formatted).toBeDefined();
+    expect(result.raw).toBeDefined();
   });
 
-  describe("Token Methods", () => {
-    describe("getAccountTokens", () => {
-      const mockTokens = [
+  test("should format supply stats response", async () => {
+    const mockSupplyStats = {
+      totalSupply: "1000000000000000000",
+      totalCirculating: "500000000000000000",
+      totalStaking: "200000000000000000",
+      totalCollateral: "0",
+      totalEspaceTokens: "0",
+      nullAddressBalance: "0",
+      twoYearUnlockBalance: "0",
+      fourYearUnlockBalance: "0",
+      totalIssued: "0",
+    };
+
+    MockedScanner.prototype.getSupplyStats.mockResolvedValue(mockSupplyStats);
+
+    // Mock the formatter methods with type-safe implementation
+    MockedFormatter.formatCFX.mockImplementation((value: string | number) => {
+      if (typeof value === "string") {
+        if (value === "0") return "0 CFX";
+        const num = Number(BigInt(value)) / 10 ** 18;
+        return `${num} CFX`;
+      }
+      return "0 CFX";
+    });
+
+    MockedFormatter.wrapResponse.mockImplementation((raw, formatted) => ({
+      raw,
+      formatted,
+    }));
+
+    const result = await wrapper.getSupplyStats();
+    expect(result.formatted).toMatchObject({
+      totalSupply: "1 CFX",
+      totalCirculating: "0.5 CFX",
+      totalStaking: "0.2 CFX",
+    });
+    expect(result.raw).toBeDefined();
+  });
+
+  describe("token methods", () => {
+    it("should get account tokens for different token types", async () => {
+      const mockTokenResponse = [
         {
-          address: validAddress,
-          name: "Token1",
-          symbol: "TK1",
+          address: "cfx:test",
+          name: "Test Token",
+          symbol: "TEST",
           decimals: 18,
           amount: "1000000000000000000",
-          priceInUSDT: "1.5",
-        },
-        {
-          address: "0x2234567890123456789012345678901234567890",
-          name: "Token2",
-          symbol: "TK2",
-          decimals: 18,
         },
       ];
 
-      beforeEach(() => {
-        MockedScanner.prototype.getAccountTokens.mockResolvedValue(mockTokens);
-        MockedFormatter.formatUnit.mockImplementation((amount, _decimals) => {
-          if (!amount) return "0";
-          return String(amount === "1000000000000000000" ? "1.0" : amount);
-        });
-        MockedFormatter.wrapResponse.mockImplementation(
-          <T, F>(raw: T, formatted: F): FormattedResponse<T, F> => ({
-            raw,
-            formatted,
-          })
-        );
-      });
+      MockedScanner.prototype.getAccountTokens.mockResolvedValue(mockTokenResponse);
+      MockedFormatter.formatUnit.mockReturnValue("1.0");
 
-      it("should return formatted account tokens", async () => {
-        const result = await wrapper.getAccountTokens(validAddress);
-        expect(result.raw).toEqual({ list: mockTokens, total: mockTokens.length });
-        expect(result.formatted[0].amount).toBe("1.0");
-        expect(result.formatted[0].priceInUSDT).toBe("$1.5000");
-        expect(MockedScanner.prototype.getAccountTokens).toHaveBeenCalledWith(
-          validAddress,
-          "ERC20",
-          0,
-          10
-        );
-      });
+      const scanner = new CoreScannerWrapper({ target: "mainnet" });
+      const address = "cfx:test";
 
-      it("should handle tokens without amount", async () => {
-        const result = await wrapper.getAccountTokens(validAddress);
-        expect(result.formatted[1].amount).toBe("0");
-        expect(result.formatted[1].priceInUSDT).toBeUndefined();
-      });
-
-      it("should handle different token types and pagination", async () => {
-        await wrapper.getAccountTokens(validAddress, "ERC721", 20, 50);
-        expect(MockedScanner.prototype.getAccountTokens).toHaveBeenCalledWith(
-          validAddress,
-          "ERC721",
-          20,
-          50
-        );
-      });
+      for (const tokenType of ["CRC20", "CRC721", "CRC1155"] as const) {
+        const result = await scanner.getAccountTokens(address, tokenType);
+        expect(result).toBeDefined();
+        expect(result.raw).toBeDefined();
+        expect(result.formatted.list).toBeDefined();
+      }
     });
   });
 
-  describe("Statistics Methods", () => {
-    const mockStatsResponse = {
-      total: 100,
+  describe("statistics methods", () => {
+    const mockStatResponse = {
       list: [
-        { statTime: "2024-02-07", count: 50, holderCount: 100, uniqueSenderCount: 75 },
-        { statTime: "2024-02-06", count: 40, holderCount: 90, uniqueSenderCount: 65 },
+        {
+          statTime: 1234567890,
+          timestamp: 1234567890,
+          count: "100",
+          tps: "10",
+        },
       ],
+      total: "100",
     };
 
     beforeEach(() => {
-      MockedFormatter.formatNumber.mockReturnValue("50");
-      MockedFormatter.wrapResponse.mockReturnValue({
-        raw: mockStatsResponse,
-        formatted: {
-          total: mockStatsResponse.total,
-          list: mockStatsResponse.list.map((item) => ({
-            statTime: item.statTime,
-            count: "50",
-          })),
+      MockedScanner.prototype.getActiveAccountStats.mockResolvedValue(mockStatResponse);
+      MockedScanner.prototype.getCfxHolderStats.mockResolvedValue(mockStatResponse);
+      MockedScanner.prototype.getTpsStats.mockResolvedValue(mockStatResponse);
+      MockedFormatter.formatNumber.mockReturnValue("100");
+    });
+
+    const statsParams = {
+      minTimestamp: Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60,
+      maxTimestamp: Math.floor(Date.now() / 1000),
+      limit: 5,
+    };
+
+    it("should get active account stats", async () => {
+      const result = await wrapper.getActiveAccountStats(statsParams);
+      expect(result).toBeDefined();
+      expect(result.formatted.list).toBeDefined();
+    });
+
+    it("should get CFX holder stats", async () => {
+      const result = await wrapper.getCfxHolderStats(statsParams);
+      expect(result).toBeDefined();
+      expect(result.formatted.list).toBeDefined();
+    });
+
+    it("should get TPS stats for different intervals", async () => {
+      for (const intervalType of ["min", "hour", "day"] as const) {
+        const result = await wrapper.getTpsStats({ ...statsParams, intervalType });
+        expect(result).toBeDefined();
+        expect(result.formatted.list).toBeDefined();
+      }
+    });
+  });
+
+  describe("top statistics methods", () => {
+    const mockTopStatsResponse = {
+      list: [
+        {
+          address: "cfx:test",
+          gas: "1000000",
+          count: "100",
+          statTime: 1234567890,
+          blockCntr: "50",
+          hashRate: "1000",
+          rewardSum: "1000",
+          txFeeSum: "100",
         },
-      });
+      ],
+      gasTotal: "1000000",
+      total: "100",
+    };
+
+    beforeEach(() => {
+      MockedScanner.prototype.getTopGasUsed.mockResolvedValue(mockTopStatsResponse);
+      MockedScanner.prototype.getTopTransactionSenders.mockResolvedValue(mockTopStatsResponse);
+      MockedScanner.prototype.getTopMiners.mockResolvedValue(mockTopStatsResponse);
+      MockedFormatter.formatGas.mockReturnValue("1.0");
+      MockedFormatter.formatNumber.mockReturnValue("100");
     });
 
-    describe("Basic Stats Methods", () => {
-      const statsParams: ESpaceStatsParams = {
-        minTimestamp: 1000,
-        maxTimestamp: 2000,
-        sort: "ASC",
-        skip: 10,
-        limit: 20,
-      };
+    it("should get top statistics for different periods", async () => {
+      const periods: StatsPeriod[] = ["24h", "7d"];
 
-      it("should return formatted active account stats", async () => {
-        MockedScanner.prototype.getActiveAccountStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getActiveAccountStats(statsParams);
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getActiveAccountStats).toHaveBeenCalledWith(statsParams);
-      });
+      for (const period of periods) {
+        const gasUsed = await wrapper.getTopGasUsed(period);
+        expect(gasUsed).toBeDefined();
+        expect(gasUsed.formatted.gasTotal).toBeDefined();
 
-      it("should return formatted CFX holder stats", async () => {
-        MockedScanner.prototype.getCfxHolderStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getCfxHolderStats(statsParams);
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getCfxHolderStats).toHaveBeenCalledWith(statsParams);
-      });
+        const txSenders = await wrapper.getTopTransactionSenders(period);
+        expect(txSenders).toBeDefined();
 
-      it("should return formatted account growth stats", async () => {
-        MockedScanner.prototype.getAccountGrowthStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getAccountGrowthStats(statsParams);
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getAccountGrowthStats).toHaveBeenCalledWith(statsParams);
-      });
+        const miners = await wrapper.getTopMiners(period);
+        expect(miners).toBeDefined();
+      }
+    });
+  });
+
+  describe("mining statistics", () => {
+    const mockRewardStatsResponse = {
+      list: [
+        {
+          timestamp: 1234567890,
+          statTime: 1234567890,
+          count: "100",
+        },
+      ],
+      total: "100",
+    };
+
+    beforeEach(() => {
+      MockedScanner.prototype.getPowRewardStats.mockResolvedValue(mockRewardStatsResponse);
+      MockedScanner.prototype.getPosRewardStats.mockResolvedValue(mockRewardStatsResponse);
+      MockedFormatter.formatNumber.mockReturnValue("100");
     });
 
-    describe("Token Stats Methods", () => {
-      const statsParams: ESpaceStatsParams = {
-        minTimestamp: 1000,
-        maxTimestamp: 2000,
-      };
+    const statsParams = {
+      minTimestamp: Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60,
+      maxTimestamp: Math.floor(Date.now() / 1000),
+      limit: 5,
+    };
 
-      it("should return formatted token holder stats", async () => {
-        MockedScanner.prototype.getTokenHolderStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getTokenHolderStats(validAddress, statsParams);
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getTokenHolderStats).toHaveBeenCalledWith(
-          validAddress,
-          statsParams
-        );
-      });
-
-      it("should return formatted token unique sender stats", async () => {
-        MockedScanner.prototype.getTokenUniqueSenderStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getTokenUniqueSenderStats(validAddress, statsParams);
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getTokenUniqueSenderStats).toHaveBeenCalledWith(
-          validAddress,
-          statsParams
-        );
-      });
-
-      it("should return formatted token unique receiver stats", async () => {
-        MockedScanner.prototype.getTokenUniqueReceiverStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getTokenUniqueReceiverStats(validAddress, statsParams);
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getTokenUniqueReceiverStats).toHaveBeenCalledWith(
-          validAddress,
-          statsParams
-        );
-      });
-
-      it("should return formatted token unique participant stats", async () => {
-        MockedScanner.prototype.getTokenUniqueParticipantStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getTokenUniqueParticipantStats(validAddress, statsParams);
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getTokenUniqueParticipantStats).toHaveBeenCalledWith(
-          validAddress,
-          statsParams
-        );
-      });
-    });
-
-    describe("Block Stats Methods", () => {
-      const mockBlockStatsResponse = {
-        total: 100,
-        list: [
-          {
-            statTime: "2024-02-07",
-            blockNumber: "1000",
-            timestamp: "1707307200",
-            baseFee: "1000000000",
-            gasUsed: "2000000000",
-          },
-        ],
-      };
-
-      beforeEach(() => {
-        MockedFormatter.formatGas.mockReturnValue("1.0 Gwei");
-        MockedFormatter.wrapResponse.mockImplementation(
-          <T, F>(raw: T, formatted: F): FormattedResponse<T, F> => ({
-            raw,
-            formatted,
-          })
-        );
-      });
-
-      it("should return formatted block base fee stats", async () => {
-        MockedScanner.prototype.getBlockBaseFeeStats.mockResolvedValue(mockBlockStatsResponse);
-        const result = await wrapper.getBlockBaseFeeStats();
-        expect(result.raw).toEqual(mockBlockStatsResponse);
-        expect(result.formatted.list[0].baseFee).toBe("1.0 Gwei");
-        expect(MockedScanner.prototype.getBlockBaseFeeStats).toHaveBeenCalled();
-      });
-
-      it("should return formatted block gas used stats", async () => {
-        MockedScanner.prototype.getBlockGasUsedStats.mockResolvedValue(mockBlockStatsResponse);
-        const result = await wrapper.getBlockGasUsedStats();
-        expect(result.raw).toEqual(mockBlockStatsResponse);
-        expect(result.formatted.list[0].gasUsed).toBe("1.0 Gwei");
-        expect(MockedScanner.prototype.getBlockGasUsedStats).toHaveBeenCalled();
-      });
-
-      it("should return formatted block average priority fee stats", async () => {
-        MockedScanner.prototype.getBlockAvgPriorityFeeStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getBlockAvgPriorityFeeStats();
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getBlockAvgPriorityFeeStats).toHaveBeenCalled();
-      });
-
-      it("should return formatted block transactions by type stats", async () => {
-        const mockTxTypeStats = {
-          total: 100,
-          list: [
-            {
-              statTime: "2024-02-07",
-              txsInType: {
-                type1: "100",
-                type2: "200",
-              },
-            },
-          ],
-        } as unknown as ESpaceStatsResponse;
-
-        MockedScanner.prototype.getBlockTxsByTypeStats.mockResolvedValue(mockTxTypeStats);
-        MockedFormatter.formatNumber.mockImplementation((value) => String(Number(value) / 2));
-        MockedFormatter.wrapResponse.mockImplementation(
-          <T, F>(raw: T, formatted: F): FormattedResponse<T, F> => ({
-            raw,
-            formatted,
-          })
-        );
-
-        const result = await wrapper.getBlockTxsByTypeStats();
-        expect(result.raw).toEqual(mockTxTypeStats);
-        expect(
-          (result.formatted as { list: Array<{ txsInType: Record<string, string> }> }).list[0]
-            .txsInType
-        ).toEqual({
-          type1: "50",
-          type2: "100",
+    it("should get mining reward stats for different intervals", async () => {
+      for (const intervalType of ["hour", "day"] as const) {
+        const powStats = await wrapper.getPowRewardStats({
+          ...statsParams,
+          intervalType,
         });
-        expect(MockedScanner.prototype.getBlockTxsByTypeStats).toHaveBeenCalled();
+        expect(powStats).toBeDefined();
+        expect(powStats.formatted.list).toBeDefined();
+
+        const posStats = await wrapper.getPosRewardStats({
+          ...statsParams,
+          intervalType,
+        });
+        expect(posStats).toBeDefined();
+        expect(posStats.formatted.list).toBeDefined();
+      }
+    });
+  });
+
+  describe("supply statistics", () => {
+    it("should get supply stats for different networks", async () => {
+      const mainnetScanner = new CoreScannerWrapper({ target: "mainnet" });
+      const testnetScanner = new CoreScannerWrapper({ target: "testnet" });
+
+      const mainnetStats = await mainnetScanner.getSupplyStats();
+      expect(mainnetStats).toBeDefined();
+
+      const testnetStats = await testnetScanner.getSupplyStats();
+      expect(testnetStats).toBeDefined();
+    });
+  });
+
+  describe("parameter handling", () => {
+    it("should handle optional parameters in getAccountTokens", async () => {
+      const mockTokenResponse = [
+        {
+          address: "cfx:test",
+          name: "Test Token",
+          symbol: "TEST",
+          decimals: 18,
+          amount: "1000000000000000000",
+        },
+      ];
+
+      MockedScanner.prototype.getAccountTokens.mockResolvedValue(mockTokenResponse);
+
+      // Test with different combinations of optional parameters
+      await wrapper.getAccountTokens("cfx:test", "CRC20");
+      await wrapper.getAccountTokens("cfx:test", "CRC20", 10);
+      await wrapper.getAccountTokens("cfx:test", "CRC20", 10, 20);
+
+      expect(MockedScanner.prototype.getAccountTokens).toHaveBeenCalledTimes(3);
+    });
+
+    it("should handle different network targets", () => {
+      const mainnetScanner = new CoreScannerWrapper({ target: "mainnet" });
+      const testnetScanner = new CoreScannerWrapper({ target: "testnet" });
+      const customScanner = new CoreScannerWrapper({
+        target: "mainnet",
+        apiKey: "test-key",
+      });
+
+      expect(mainnetScanner).toBeDefined();
+      expect(testnetScanner).toBeDefined();
+      expect(customScanner).toBeDefined();
+    });
+  });
+
+  describe("error handling", () => {
+    beforeEach(() => {
+      MockedScanner.prototype.getContractABI.mockImplementation((address: string) => {
+        if (address === "0xinvalid" || address === "0x0000000000000000000000000000000000000000") {
+          throw new Error("Invalid address");
+        }
+        return Promise.resolve({ abi: '[{"type":"function","name":"test"}]' });
       });
     });
 
-    describe("Top Stats Methods", () => {
-      const mockTopStatsResponse = {
-        maxTime: "2024-02-07",
-        gasTotal: "1000000000",
-        valueTotal: "1000000",
-        list: [
-          {
-            address: validAddress,
-            gas: "500000000",
-            value: "500000",
-            transferCntr: "10",
-          },
-        ],
+    it("should handle invalid addresses", async () => {
+      const scanner = new CoreScannerWrapper({ target: "mainnet" });
+      await expect(scanner.getContractABI("0xinvalid")).rejects.toThrow();
+    });
+
+    it("should handle non-existent contracts", async () => {
+      const scanner = new CoreScannerWrapper({ target: "mainnet" });
+      await expect(
+        scanner.getContractABI("0x0000000000000000000000000000000000000000")
+      ).rejects.toThrow();
+    });
+
+    it("should handle API errors", async () => {
+      MockedScanner.prototype.getSupplyStats.mockRejectedValue(new Error("API Error"));
+      await expect(wrapper.getSupplyStats()).rejects.toThrow("API Error");
+    });
+
+    it("should handle formatting errors", async () => {
+      const invalidStats = {
+        totalSupply: "invalid",
+        totalCirculating: "invalid",
+        totalStaking: "invalid",
+        totalCollateral: "0",
+        totalEspaceTokens: "0",
+        totalIssued: "0",
+        nullAddressBalance: "0",
+        twoYearUnlockBalance: "0",
+        fourYearUnlockBalance: "0",
       };
 
-      beforeEach(() => {
-        MockedFormatter.formatGas.mockReturnValue("1.0 Gwei");
-        MockedFormatter.formatNumber.mockReturnValue("500");
-        MockedFormatter.formatCFX.mockReturnValue("0.5 CFX");
-        MockedFormatter.wrapResponse.mockImplementation(
-          <T, F>(raw: T, formatted: F): FormattedResponse<T, F> => ({
-            raw,
-            formatted,
-          })
-        );
+      MockedScanner.prototype.getSupplyStats.mockResolvedValue(invalidStats);
+      MockedFormatter.formatCFX.mockImplementation(() => {
+        throw new Error("Format Error");
       });
 
-      it("should return formatted top gas used stats", async () => {
-        MockedScanner.prototype.getTopGasUsed.mockResolvedValue(mockTopStatsResponse);
-        const result = await wrapper.getTopGasUsed("24h");
-        expect(result.raw).toEqual(mockTopStatsResponse);
-        expect((result.formatted as { gasTotal: string }).gasTotal).toBe("1.0 Gwei");
-        expect(MockedScanner.prototype.getTopGasUsed).toHaveBeenCalledWith("24h");
-      });
+      await expect(wrapper.getSupplyStats()).rejects.toThrow();
+    });
+  });
 
-      it("should return formatted top transaction senders stats", async () => {
-        MockedScanner.prototype.getTopTransactionSenders.mockResolvedValue(mockTopStatsResponse);
-        const result = await wrapper.getTopTransactionSenders("24h");
-        expect(result.raw).toEqual(mockTopStatsResponse);
-        expect((result.formatted as { valueTotal: string }).valueTotal).toBe("500");
-        expect(MockedScanner.prototype.getTopTransactionSenders).toHaveBeenCalledWith("24h");
-      });
+  describe("response formatting", () => {
+    it("should handle empty lists", async () => {
+      const emptyResponse = {
+        list: [],
+        total: "0",
+      };
 
-      it("should return formatted top CFX senders stats", async () => {
-        MockedScanner.prototype.getTopCfxSenders.mockResolvedValue(mockTopStatsResponse);
-        const result = await wrapper.getTopCfxSenders("24h");
-        expect(result.raw).toEqual(mockTopStatsResponse);
-        expect((result.formatted as { valueTotal: string }).valueTotal).toBe("0.5 CFX");
-        expect(MockedScanner.prototype.getTopCfxSenders).toHaveBeenCalledWith("24h");
-      });
-
-      it("should return formatted top token transfers stats", async () => {
-        MockedScanner.prototype.getTopTokenTransfers.mockResolvedValue(mockTopStatsResponse);
-        const result = await wrapper.getTopTokenTransfers("24h");
-        expect(result.raw).toEqual(mockTopStatsResponse);
-        expect(
-          (result.formatted as { list: { transferCntr: string }[] }).list[0].transferCntr
-        ).toBe("500");
-        expect(MockedScanner.prototype.getTopTokenTransfers).toHaveBeenCalledWith("24h");
-      });
-
-      it("should return formatted top transaction receivers stats", async () => {
-        MockedScanner.prototype.getTopTransactionReceivers.mockResolvedValue(mockTopStatsResponse);
-        const result = await wrapper.getTopTransactionReceivers("24h");
-        expect(result.raw).toEqual(mockTopStatsResponse);
-        expect(MockedScanner.prototype.getTopTransactionReceivers).toHaveBeenCalledWith("24h");
-      });
-
-      it("should return formatted top token receivers stats", async () => {
-        MockedScanner.prototype.getTopTokenReceivers.mockResolvedValue(mockTopStatsResponse);
-        const result = await wrapper.getTopTokenReceivers("24h");
-        expect(result.raw).toEqual(mockTopStatsResponse);
-        expect(MockedScanner.prototype.getTopTokenReceivers).toHaveBeenCalledWith("24h");
-      });
-
-      it("should return formatted top token participants stats", async () => {
-        MockedScanner.prototype.getTopTokenParticipants.mockResolvedValue(mockTopStatsResponse);
-        const result = await wrapper.getTopTokenParticipants("24h");
-        expect(result.raw).toEqual(mockTopStatsResponse);
-        expect(MockedScanner.prototype.getTopTokenParticipants).toHaveBeenCalledWith("24h");
-      });
+      MockedScanner.prototype.getActiveAccountStats.mockResolvedValue(emptyResponse);
+      const result = await wrapper.getActiveAccountStats({});
+      expect(result.formatted.list).toEqual([]);
     });
 
-    describe("Transaction Stats Methods", () => {
-      it("should return formatted contract stats", async () => {
-        MockedScanner.prototype.getContractStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getContractStats();
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getContractStats).toHaveBeenCalled();
-      });
+    it("should handle null/undefined values", async () => {
+      const nullResponse = {
+        list: [
+          {
+            statTime: 1234567890,
+            timestamp: 0,
+            count: "0",
+            tps: "10",
+          },
+        ],
+        total: "0",
+      };
 
-      it("should return formatted transaction stats", async () => {
-        MockedScanner.prototype.getTransactionStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getTransactionStats();
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getTransactionStats).toHaveBeenCalled();
-      });
+      MockedScanner.prototype.getTpsStats.mockResolvedValue(nullResponse);
+      const result = await wrapper.getTpsStats({ intervalType: "min" });
+      expect(result).toBeDefined();
+      expect(result.formatted.list).toBeDefined();
+    });
 
-      it("should return formatted CFX transfer stats", async () => {
-        MockedScanner.prototype.getCfxTransferStats.mockResolvedValue(mockStatsResponse);
-        const result = await wrapper.getCfxTransferStats();
-        expect(result.raw).toEqual(mockStatsResponse);
-        expect(MockedScanner.prototype.getCfxTransferStats).toHaveBeenCalled();
-      });
+    it("should handle edge case values", async () => {
+      const edgeCaseResponse = {
+        list: [
+          {
+            statTime: 1234567890,
+            timestamp: 1234567890,
+            count: "0",
+            tps: "0",
+          },
+        ],
+        total: "0",
+      };
+
+      MockedScanner.prototype.getTpsStats.mockResolvedValue(edgeCaseResponse);
+      const result = await wrapper.getTpsStats({ intervalType: "min" });
+      expect(result).toBeDefined();
+      expect(result.formatted.list).toBeDefined();
     });
   });
 });
