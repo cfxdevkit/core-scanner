@@ -1,7 +1,7 @@
 {
   "name": "@cfxdevkit/confluxscan-core",
   "version": "0.1.4",
-  "description": "A TypeScript library for interacting with Conflux Confluxscan API",
+  "description": "A TypeScript library for interacting with Conflux Core Confluxscan API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -85,5 +85,19 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/index.d.ts"
+      ]
+    }
   }
 }

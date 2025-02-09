@@ -49,31 +49,34 @@ export class ResponseFormatter {
     return [`Time: ${formattedTime}`, ...entries].join("\n");
   }
 
-  static formatTopStats(data: CoreTopStatsResponse): string {
-    if (!data?.list?.length) return "No data available";
+  static formatTopStats(data: CoreTopStatsResponse): string[] {
+    const lines: string[] = [];
 
-    const lines = [];
     if (data.gasTotal) {
-      lines.push(`Total Gas Used: ${this.formatGas(data.gasTotal)}`);
+      lines.push(`Total Gas: ${this.formatGas(data.gasTotal)}`);
     }
+
     if (data.valueTotal) {
       lines.push(`Total Value: ${this.formatNumber(data.valueTotal)}`);
     }
 
-    data.list.forEach((item, index) => {
-      lines.push(`#${index + 1} ${item.address}`);
+    data.list.forEach((item) => {
+      lines.push(`Address: ${item.address}`);
+
       if (item.gas) {
-        lines.push(`Gas Used: ${this.formatGas(item.gas)}`);
+        lines.push(`Gas: ${this.formatGas(item.gas)}`);
       }
+
       if (item.value) {
         lines.push(`Value: ${this.formatNumber(item.value)}`);
       }
+
       if (item.transferCntr) {
         lines.push(`Transfers: ${this.formatNumber(item.transferCntr)}`);
       }
     });
 
-    return lines.join("\n");
+    return lines;
   }
 
   static wrapResponse<T, F = T>(raw: T, formatted: F): FormattedResponse<T, F> {

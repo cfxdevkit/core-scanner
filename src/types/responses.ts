@@ -78,24 +78,60 @@ export interface TopValueItem {
   value: string | number;
 }
 
-export interface CoreStatItem {
-  statTime: string | number;
-  [key: string]: string | number;
-}
-
-export interface TopStatsItem extends StatItem {
+/**
+ * Represents a single item in top statistics responses
+ */
+export interface TopStatsItem {
+  /** The address associated with the stats */
   address: string;
+  /** Amount of gas used */
   gas?: string;
+  /** Number of transactions/operations */
+  count: string;
+  /** Timestamp of the stats */
+  statTime: string | number;
+  /** Number of blocks */
+  blockCntr?: string;
+  /** Hash rate for mining stats */
+  hashRate?: string;
+  /** Total rewards earned */
+  rewardSum?: string;
+  /** Total transaction fees */
+  txFeeSum?: string;
+  /** Value in transactions */
   value?: string | number;
+  /** Number of transfers */
   transferCntr?: string | number;
 }
 
+/**
+ * Represents a single item in core statistics responses
+ */
+export interface CoreStatItem {
+  /** Timestamp of the stat */
+  statTime: string | number;
+  /** Count/value of the stat */
+  count: string | number;
+  /** Optional timestamp field */
+  timestamp?: string | number;
+  /** Optional transactions per second */
+  tps?: string | number;
+}
+
+/**
+ * Response structure for top statistics endpoints
+ */
 export interface CoreTopStatsResponse {
-  gasTotal?: string;
-  valueTotal?: string | number;
-  maxTime?: string;
-  total?: number;
+  /** List of top stats items */
   list: TopStatsItem[];
+  /** Total gas used */
+  gasTotal?: string;
+  /** Total value */
+  valueTotal?: string | number;
+  /** Maximum time */
+  maxTime?: string;
+  /** Total count */
+  total: string | number;
 }
 
 export interface ESpaceStatsResponse {

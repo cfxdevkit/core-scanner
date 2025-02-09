@@ -124,7 +124,7 @@ export class CoreScannerWrapper {
       ...data,
       list: data.list.map((item) => ({
         ...item,
-        value: ResponseFormatter.formatNumber(item.value),
+        value: item.value ? ResponseFormatter.formatNumber(item.value) : undefined,
       })),
     };
     return ResponseFormatter.wrapResponse(data, formattedData);

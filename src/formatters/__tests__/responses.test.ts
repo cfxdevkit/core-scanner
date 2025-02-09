@@ -3,7 +3,7 @@ import { NumberFormatter } from "../numbers";
 import { DateFormatter } from "../dates";
 import { jest } from "@jest/globals";
 import { formatUnits } from "cive";
-import { TopStatsItem } from "../../types";
+import { CoreTopStatsResponse } from "../../types/responses";
 
 jest.mock("../numbers");
 jest.mock("../dates");
@@ -135,26 +135,28 @@ describe("ResponseFormatter", () => {
       MockedNumberFormatter.formatGas.mockImplementation((val) => val?.toString() || "0");
     });
 
-    const mockTopStats = {
-      gasTotal: "1000000",
-      valueTotal: "2000000",
-      list: [
-        {
-          address: "cfx:type.user.address",
-          gas: "500000",
-          value: "1000000",
-          transferCntr: "100",
-          statTime: 1234567890,
-          count: "1",
-        },
-      ] as TopStatsItem[],
-    };
+    it("should format top stats data", () => {
+      const mockTopStats: CoreTopStatsResponse = {
+        gasTotal: "1000000",
+        valueTotal: "500000",
+        list: [
+          {
+            address: "cfx:test",
+            gas: "100000",
+            value: "50000",
+            count: "10",
+            statTime: 1234567890,
+            transferCntr: "5",
+          },
+        ],
+        total: "1",
+      };
 
-    test("should format top stats correctly", () => {
       const result = ResponseFormatter.formatTopStats(mockTopStats);
-      expect(result).toContain("Total Gas Used: 1000000");
-      expect(result).toContain("Total Value: 2000000");
-      expect(result).toContain("#1 cfx:type.user.address");
+      expect(result).toBeDefined();
+      expect(result).toContain("Total Gas: 1000000");
+      expect(result).toContain("Total Value: 500000");
+      expect(result).toContain("Address: cfx:test");
     });
   });
 
