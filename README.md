@@ -1,6 +1,6 @@
-# @cfxdevkit/confluxscan-espace
+# @cfxdevkit/confluxscan-core
 
-A TypeScript library for interacting with Conflux eSpace Scanner API.
+A TypeScript library for interacting with Conflux Core Confluxscan API.
 
 ## Installation
 
@@ -26,19 +26,22 @@ yarn add @cfxdevkit/confluxscan-core
 ```typescript
 import { CoreScanner, CoreScannerWrapper } from "@cfxdevkit/confluxscan-core";
 
+const scanner = new CoreScanner({target: "mainnet"});
+
 // Initialize scanner with configuration
-const scanner = new CoreScannerWrapper({ 
+const scannerWrapper = new CoreScannerWrapper({ 
     target: "mainnet", 
     apiKey: "YOUR_API_KEY" // optional
 });
 
 // Get contract ABI with formatted output
-const { formatted, raw } = await scanner.getContractABI("0x1234...");
-console.log(formatted); // Pretty printed output
+const { formatted, raw } = await scannerWrapper.getContractABI("0x1234...");
+console.log(formatted); // Human readable output
 console.log(raw); // Raw data
 
 // Get token statistics
 const stats = await scanner.getTokenHolderStats("0x1234...");
+console.log(stats); // Raw data
 
 // Use formatters directly
 import { NumberFormatter, DateFormatter } from "@cfxdevkit/confluxscan-core";
