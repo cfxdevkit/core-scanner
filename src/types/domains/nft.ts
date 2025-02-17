@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * NFT-related type definitions for the Conflux eSpace Scanner SDK.
+ * NFT-related type definitions for the Conflux Core Scanner SDK.
  * Contains types for NFT balances, tokens, metadata, and transfers.
  * @module types/domains/nft
  */

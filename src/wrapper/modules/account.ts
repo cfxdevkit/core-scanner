@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Account wrapper module for the Conflux eSpace Scanner SDK.
+ * Account wrapper module for the Conflux Core Scanner SDK.
  * Provides high-level methods for account operations with data formatting.
  * @module wrapper/modules/account
  * @category Wrappers

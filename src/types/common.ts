@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Common type definitions used across the Conflux eSpace Scanner SDK.
+ * Common type definitions used across the Conflux Core Scanner SDK.
  * Contains shared types for pagination, block tags, token types, and other common parameters.
  * @module types/common
  */

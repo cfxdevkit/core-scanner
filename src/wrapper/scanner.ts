@@ -1,5 +1,5 @@
 /**
- * High-level wrapper for the Conflux eSpace Scanner API.
+ * High-level wrapper for the Conflux Core Scanner API.
  * Provides formatted responses and additional data processing on top of the core modules.
  * All functionality is delegated to specialized modules for better organization and maintainability.
  *

@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Contract module for interacting with smart contracts on Conflux eSpace.
+ * Contract module for interacting with smart contracts on Conflux Core.
  * Provides functionality for retrieving contract information, verification, and source code management.
  * @module core/modules/contract
  */
@@ -11,7 +11,7 @@ import { createLogger } from "../../utils/logger";
 import { ApiConfig, Contract } from "../../types";
 
 /**
- * Module for handling smart contract operations on Conflux eSpace.
+ * Module for handling smart contract operations on Conflux Core.
  * Provides methods for retrieving contract ABIs, source code, and managing contract verification.
  *
  * @class ContractModule

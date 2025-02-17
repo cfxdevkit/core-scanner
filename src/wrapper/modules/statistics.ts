@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Statistics-related wrapper module for the Conflux eSpace Scanner SDK.
+ * Statistics-related wrapper module for the Conflux Core Scanner SDK.
  * Provides high-level methods for statistics operations with data formatting.
  * @module wrapper/modules/statistics
  * @category Wrappers

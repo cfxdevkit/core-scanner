@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Contract-related type definitions for the Conflux eSpace Scanner SDK.
+ * Contract-related type definitions for the Conflux Core Scanner SDK.
  * Contains types for contract source code, ABI, and verification.
  * @module types/domains/contract
  */

@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * NFT module for interacting with NFTs on Conflux eSpace.
+ * NFT module for interacting with NFTs on Conflux Core.
  * Provides functionality for querying NFT balances, tokens, transfers, and ownership information.
  * @module core/modules/nft
  */
@@ -12,7 +12,7 @@ import { NFT } from "../../types";
 import { ApiConfig } from "../../types";
 
 /**
- * Module for handling NFT-related operations on Conflux eSpace.
+ * Module for handling NFT-related operations on Conflux Core.
  * Provides methods for querying NFT balances, tokens, transfers, and ownership information.
  *
  * @class NFTModule

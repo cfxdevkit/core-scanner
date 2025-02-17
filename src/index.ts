@@ -1,5 +1,5 @@
 /**
- * Conflux eSpace Scanner API SDK
+ * Conflux Core Scanner API SDK
  * @module @cfxdevkit/confluxscan-core
  */
 

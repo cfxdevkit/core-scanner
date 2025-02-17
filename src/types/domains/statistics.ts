@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Statistics-related type definitions for the Conflux eSpace Scanner SDK.
+ * Statistics-related type definitions for the Conflux Core Scanner SDK.
  * Contains types for network statistics, token metrics, and account activity.
  * @module types/domains/statistics
  */

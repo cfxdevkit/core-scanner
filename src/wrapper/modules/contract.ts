@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Contract-related wrapper module for the Conflux eSpace Scanner SDK.
+ * Contract-related wrapper module for the Conflux Core Scanner SDK.
  * Provides high-level methods for contract operations with data formatting.
  * @module wrapper/modules/contract
  * @category Wrappers

@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Base type definitions used across the Conflux eSpace Scanner SDK.
+ * Base type definitions used across the Conflux Core Scanner SDK.
  * Contains core types for API configuration and responses.
  * @module types/base
  * @category Types
@@ -17,7 +17,7 @@ export type ConfluxTarget = "mainnet" | "testnet";
 
 /**
  * API configuration options.
- * Contains settings for connecting to the Conflux eSpace Scanner API.
+ * Contains settings for connecting to the Conflux Core Scanner API.
  *
  * @public
  * @category Types

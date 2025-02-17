@@ -1,19 +1,5 @@
 import util from "util";
 import { DateFormatter } from "../../src";
-import { BlockModule } from "../../src";
-
-const blockModule = new BlockModule({ target: "mainnet" });
-
-/**
- * Get the current block number
- */
-export const getCurrentBlockNumber = async (): Promise<number> => {
-  return Number(
-    await blockModule.getBlockNumberByTime({
-      timestamp: DateFormatter.getCurrentTimestamp(),
-    })
-  );
-};
 
 /**
  * Common test addresses used across examples

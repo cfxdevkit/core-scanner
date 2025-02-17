@@ -1,5 +1,5 @@
 /**
- * Core functionality for interacting with the Conflux eSpace Scanner API.
+ * Core functionality for interacting with the Conflux Core Scanner API.
  * @module core
  */
 

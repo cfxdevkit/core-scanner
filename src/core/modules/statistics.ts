@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Statistics module for retrieving network and blockchain statistics from Conflux eSpace.
+ * Statistics module for retrieving network and blockchain statistics from Conflux Core.
  * Provides comprehensive functionality for querying various metrics, analytics, and statistics.
  * @module core/modules/statistics
  */
@@ -11,7 +11,7 @@ import { ApiConfig } from "../../types";
 import { Statistics } from "../../types";
 
 /**
- * Module for handling statistics and analytics operations on Conflux eSpace.
+ * Module for handling statistics and analytics operations on Conflux Core.
  * Provides methods for querying network metrics, account statistics, transaction data,
  * and various other blockchain analytics.
  *

@@ -1,7 +1,7 @@
 /**
  * @packageDocumentation
- * Core API module for the Conflux eSpace Scanner SDK.
- * This file contains the base API class that handles HTTP requests to the Conflux eSpace API.
+ * Core API module for the Conflux Core Scanner SDK.
+ * This file contains the base API class that handles HTTP requests to the Conflux Core API.
  * @module core/api
  */
 
@@ -9,7 +9,7 @@ import { ApiConfig, ApiResponse } from "../types";
 import { createLogger } from "../utils/logger";
 
 /**
- * Base API class for making HTTP requests to the Conflux eSpace API.
+ * Base API class for making HTTP requests to the Conflux Core API.
  * Provides common functionality for API endpoints including request handling and error management.
  *
  * @class CoreApi

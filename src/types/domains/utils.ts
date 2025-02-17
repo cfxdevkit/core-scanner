@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Utility type definitions for the Conflux eSpace Scanner SDK.
+ * Utility type definitions for the Conflux Core Scanner SDK.
  * Contains types for method decoding and other utility functions.
  * @module types/domains/utils
  */

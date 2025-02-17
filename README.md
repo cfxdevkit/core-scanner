@@ -1,6 +1,6 @@
 # @cfxdevkit/confluxscan-core
 
-A TypeScript library for interacting with Conflux eSpace Scanner API.
+A TypeScript library for interacting with Conflux Core confluxscan API.
 
 [![npm version](https://img.shields.io/npm/v/@cfxdevkit/confluxscan-core)](https://www.npmjs.com/package/@cfxdevkit/confluxscan-core)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/cfxdevkit/core-scanner/ci.yml)](https://github.com/cfxdevkit/core-scanner/actions)
@@ -20,7 +20,7 @@ npm install @cfxdevkit/confluxscan-core
 ## Features
 
 - Full TypeScript support with comprehensive type definitions
-- Complete Conflux eSpace Scanner API coverage
+- Complete Conflux Core confluxscan API coverage
 - Comprehensive data formatting utilities
 - Built-in error handling and address validation
 - Detailed documentation and examples
@@ -40,7 +40,7 @@ src/
 │       ├── contract.ts  # Smart contract operations
 │       ├── nft.ts       # NFT-related operations
 │       ├── statistics.ts # Network statistics
-│       └── token.ts     # Token operations
+│       └── utils.ts     # Utility operations
 ├── formatters/          # Data formatting utilities
 │   ├── dates.ts        # Date and timestamp formatting
 │   ├── numbers.ts      # Numeric and unit formatting
@@ -59,38 +59,39 @@ src/
 ## Core Modules
 
 ### Account Module
-- Balance queries (single/multi-address)
+- Account balance queries
 - Transaction history
 - Token transfer history
 - NFT transfer tracking
-- Mining history
-- Balance history
+- Account statistics
 
 ### Contract Module
-- ABI retrieval
+- Contract ABI retrieval
 - Source code access
-- Contract verification
-- Proxy contract support
+- Contract verification status
+- Contract creation info
+- Contract events and logs
 
 ### NFT Module
-- NFT balances
-- Token metadata
+- NFT holdings and balances
+- Token metadata and details
 - Transfer history
-- Ownership tracking
+- Collection information
+- NFT minting history
 
 ### Statistics Module
-- Network metrics
-- Account activity
+- Network metrics and analytics
+- Account activity statistics
 - Transaction analytics
-- Token statistics
 - Gas usage metrics
 - Mining statistics
 
-### Token Module
-- Token balances
-- Supply information
-- Transfer history
-- Historical data
+### Utils Module
+- Address validation and formatting
+- Transaction hash validation
+- Block number utilities
+- Network status checks
+- General utility functions
 
 ## Formatters
 
@@ -127,10 +128,10 @@ NumberFormatter.formatCFX("1000000000000000000"); // "1 CFX"
 import { AddressValidator } from "@cfxdevkit/confluxscan-core";
 
 // Validate single address
-AddressValidator.validateAddress("0x1234..."); // true/false
+AddressValidator.validateAddress("cfx:1234..."); // true/false
 
 // Validate multiple addresses
-AddressValidator.validateAddresses(["0x1234...", "0x5678..."]); // true/false
+AddressValidator.validateAddresses(["cfx:1234...", "cfx:5678..."]); // true/false
 ```
 
 ### Logging
@@ -157,32 +158,44 @@ const testnetScanner = new CoreScannerWrapper({ target: "testnet" });
 // With API key for higher rate limits
 const scannerWithApiKey = new CoreScannerWrapper({
     target: "mainnet",
-    apiKey: "YOUR_API_KEY" // optional
+    apiKey: "YOUR_API_KEY", // optional
+    host: "YOUR_CUSTOM_HOST" // optional, for custom endpoint
 });
 ```
 
 ### Account Operations
 
 ```typescript
-// Get account balance
-const balance = await scanner.account.getBalance({
-    address: "0x1234...",
-    tag: "latest"
+// Get account transactions
+const transactions = await scanner.account.AccountTransactions({
+    account: "cfx:1234...",
+    skip: 0,
+    limit: 10,
+    sort: "DESC"
 });
 
-// Get transaction history
-const transactions = await scanner.account.getTransactionList({
-    address: "0x1234...",
-    startblock: 1000000,
-    endblock: 2000000,
-    page: 1,
-    offset: 10
+// Get CFX transfers
+const cfxTransfers = await scanner.account.CfxTransfers({
+    account: "cfx:1234...",
+    skip: 0,
+    limit: 10,
+    sort: "DESC"
 });
 
-// Get token transfers
-const transfers = await scanner.account.getTokenTransfers({
-    address: "0x1234...",
-    contractaddress: "0x5678..." // optional
+// Get CRC20 token transfers
+const tokenTransfers = await scanner.account.Crc20Transfers({
+    account: "cfx:1234...",
+    skip: 0,
+    limit: 10,
+    sort: "DESC"
+});
+
+// Get CRC721 NFT transfers
+const nftTransfers = await scanner.account.Crc721Transfers({
+    account: "cfx:1234...",
+    skip: 0,
+    limit: 10,
+    sort: "DESC"
 });
 ```
 
@@ -191,18 +204,24 @@ const transfers = await scanner.account.getTokenTransfers({
 ```typescript
 // Get contract ABI
 const abi = await scanner.contract.getABI({
-    address: "0x1234..."
+    address: "cfx:1234..."
 });
 
 // Get contract source code
 const source = await scanner.contract.getSourceCode({
-    address: "0x1234..."
+    address: "cfx:1234..."
 });
 
-// Verify proxy contract
-const verification = await scanner.contract.verifyProxyContract({
-    address: "0x1234...",
-    expectedimplementation: "0x5678..."
+// Get contract creation info
+const creation = await scanner.contract.getCreationInfo({
+    address: "cfx:1234..."
+});
+
+// Get contract events
+const events = await scanner.contract.getEvents({
+    address: "cfx:1234...",
+    skip: 0,
+    limit: 10
 });
 ```
 
@@ -211,60 +230,87 @@ const verification = await scanner.contract.verifyProxyContract({
 ```typescript
 // Get NFT balances
 const balances = await scanner.nft.getBalances({
-    owner: "0x1234..."
+    owner: "cfx:1234...",
+    skip: 0,
+    limit: 10
+});
+
+// Get NFT tokens
+const tokens = await scanner.nft.getTokens({
+    contract: "cfx:1234...",
+    skip: 0,
+    limit: 10,
+    withMetadata: true
+});
+
+// Get NFT owners
+const owners = await scanner.nft.getOwners({
+    contract: "cfx:1234...",
+    tokenId: "1",
+    limit: 10
 });
 
 // Get NFT transfers
 const transfers = await scanner.nft.getTransfers({
-    contract: "0x1234...",
-    tokenId: "1"
-});
-
-// Get NFT metadata
-const metadata = await scanner.nft.getPreview({
-    contract: "0x1234...",
+    contract: "cfx:1234...",
     tokenId: "1",
-    withMetadata: true
+    limit: 10,
+    sort: "DESC"
 });
 ```
 
 ### Statistics Operations
 
 ```typescript
-// Get network statistics
-const supply = await scanner.statistics.getSupply();
-
-// Get mining statistics
-const mining = await scanner.statistics.getMining({
-    intervalType: "day",
+// Get contract statistics
+const contractStats = await scanner.statistics.getContract({
     minTimestamp: 1234567890,
-    maxTimestamp: 2345678901
+    maxTimestamp: 2345678901,
+    sort: "DESC",
+    skip: 0,
+    limit: 10
 });
 
-// Get top accounts
-const topSenders = await scanner.statistics.getTopTransactionSender({
-    spanType: "24h"
+// Get account growth statistics
+const accountGrowth = await scanner.statistics.getAccountGrowth({
+    minTimestamp: 1234567890,
+    maxTimestamp: 2345678901,
+    sort: "DESC",
+    skip: 0,
+    limit: 10
+});
+
+// Get active account statistics
+const activeAccounts = await scanner.statistics.getAccountActive({
+    minTimestamp: 1234567890,
+    maxTimestamp: 2345678901,
+    sort: "DESC",
+    skip: 0,
+    limit: 10
+});
+
+// Get overall active account statistics
+const overallStats = await scanner.statistics.getAccountActiveOverall({
+    minTimestamp: 1234567890,
+    maxTimestamp: 2345678901,
+    sort: "DESC",
+    skip: 0,
+    limit: 10
 });
 ```
 
-### Token Operations
+### Utils Operations
 
 ```typescript
-// Get token balance
-const balance = await scanner.token.getTokenBalance({
-    address: "0x1234...",
-    contractaddress: "0x5678..."
+// Decode transaction method
+const decodedMethod = await scanner.utils.decodeMethod({
+    hashes: "0x1234..."
 });
 
-// Get token supply
-const supply = await scanner.token.getTokenSupply({
-    contractaddress: "0x1234..."
-});
-
-// Get historical data
-const history = await scanner.token.getTokenSupplyHistory({
-    contractaddress: "0x1234...",
-    blockno: 1000000
+// Decode raw method data
+const decodedRaw = await scanner.utils.decodeMethodRaw({
+    contracts: "0x1234...",
+    inputs: "0x5678..."
 });
 ```
 
@@ -293,6 +339,13 @@ npm run docs
 # Lint and format code
 npm run lint
 npm run format
+
+# Run examples
+npm run example:scanner:account
+npm run example:scanner:contract
+npm run example:scanner:nft
+npm run example:scanner:statistics
+npm run example:scanner:utils
 ```
 
 ## Documentation

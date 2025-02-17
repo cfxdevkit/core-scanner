@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * Address validation utilities for Conflux eSpace.
+ * Address validation utilities for Conflux Core.
  * Provides functionality for validating single and multiple Conflux-style addresses.
  * Uses cive's isAddress for validation and includes logging.
  * @module utils/validation
@@ -12,7 +12,7 @@ import { createLogger } from "./logger";
 const logger = createLogger("AddressValidator");
 
 /**
- * Utility class for validating Conflux-style addresses used in Conflux eSpace.
+ * Utility class for validating Conflux-style addresses used in Conflux Core.
  * Provides methods for validating both single addresses and arrays of addresses.
  *
  * @class AddressValidator
@@ -34,7 +34,7 @@ export class AddressValidator {
   static validateAddress(address: string): boolean {
     const isValid = isAddress(address);
     if (!isValid) {
-      logger.error({ address }, "Invalid eSpace address provided");
+      logger.error({ address }, "Invalid Core address provided");
     } else {
       logger.debug({ address }, "Address validation successful");
     }

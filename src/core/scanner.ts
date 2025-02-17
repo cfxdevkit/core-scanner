@@ -1,12 +1,12 @@
 /**
  * @packageDocumentation
- * Core Scanner implementation for the Conflux eSpace Scanner API.
+ * Core Scanner implementation for the Conflux Core Scanner API.
  * This file contains the main scanner class that provides access to all API modules.
  * @module core/scanner
  */
 
 /**
- * Core implementation of the Conflux eSpace Scanner API.
+ * Core implementation of the Conflux Core Scanner API.
  * Provides direct access to all API endpoints with basic data validation and error handling.
  */
 import { CoreApi } from "./api";
@@ -15,7 +15,7 @@ import { AccountModule, ContractModule, NFTModule, StatisticsModule, UtilsModule
 import { ApiConfig } from "../types";
 
 /**
- * Main scanner class that provides access to all Conflux eSpace API modules.
+ * Main scanner class that provides access to all Conflux Core API modules.
  * Extends the base API class with specific module implementations.
  *
  * @class CoreScanner
