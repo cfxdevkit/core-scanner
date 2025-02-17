@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Date and timestamp formatting utilities.
+ * Provides functionality for consistent date formatting and timestamp calculations.
+ * All timestamps are handled in UTC to ensure consistency across different timezones.
+ * @module formatters/dates
+ */
+
 import { createLogger } from "../utils/logger";
 
 const logger = createLogger("DateFormatter");
@@ -9,22 +17,41 @@ const logger = createLogger("DateFormatter");
 export class DateFormatter {
   /**
    * Formats a timestamp into a human-readable date string.
-   * @param timestamp - Unix timestamp (seconds) or ISO date string
-   * @returns Formatted date string in "YYYY-MM-DD HH:mm:ss" format (UTC)
+   * Supports multiple output formats and handles both Unix timestamps and ISO date strings.
+   *
+   * @param {number | string} timestamp - Unix timestamp (seconds) or ISO date string
+   * @param {"full" | "date" | "unix"} [style="full"] - Format style
+   * @returns {string} Formatted date string
+   * @throws {Error} If the timestamp is invalid or cannot be parsed
+   *
    * @example
-   * formatTimestamp(1707307200) // returns "2024-02-07 12:00:00"
-   * formatTimestamp("2024-02-07T12:00:00Z") // returns "2024-02-07 12:00:00"
+   * // Returns "2024-02-07 12:00:00"
+   * DateFormatter.formatDate(1707307200, "full")
+   * // Returns "2024-02-07"
+   * DateFormatter.formatDate(1707307200, "date")
+   * // Returns "1707307200"
+   * DateFormatter.formatDate(1707307200, "unix")
    */
-  static formatTimestamp(timestamp: number | string): string {
+  static formatDate(timestamp: number | string, style: "full" | "date" | "unix" = "full"): string {
     try {
       const date = typeof timestamp === "string" ? new Date(timestamp) : new Date(timestamp * 1000);
-      if (isNaN(date.getTime())) {
+      if (isNaN(date.getTime()) || timestamp === null || timestamp === undefined) {
         logger.warn({ timestamp }, "Invalid timestamp provided");
         return "N/A";
       }
+
+      if (style === "unix") {
+        return Math.floor(date.getTime() / 1000).toString();
+      }
+
       const year = date.getUTCFullYear();
       const month = String(date.getUTCMonth() + 1).padStart(2, "0");
       const day = String(date.getUTCDate()).padStart(2, "0");
+
+      if (style === "date") {
+        return `${year}-${month}-${day}`;
+      }
+
       const hours = String(date.getUTCHours()).padStart(2, "0");
       const minutes = String(date.getUTCMinutes()).padStart(2, "0");
       const seconds = String(date.getUTCSeconds()).padStart(2, "0");
@@ -44,8 +71,30 @@ export class DateFormatter {
   }
 
   /**
+   * Formats a timestamp into a human-readable date string.
+   * Always returns the full format (YYYY-MM-DD HH:mm:ss) in UTC.
+   *
+   * @param {number | string} timestamp - Unix timestamp (seconds) or ISO date string
+   * @returns {string} Formatted date string in "YYYY-MM-DD HH:mm:ss" format (UTC)
+   *
+   * @example
+   * // Returns "2024-02-07 12:00:00"
+   * DateFormatter.formatTimestamp(1707307200)
+   * // Returns "2024-02-07 12:00:00"
+   * DateFormatter.formatTimestamp("2024-02-07T12:00:00Z")
+   */
+  static formatTimestamp(timestamp: number | string): string {
+    return this.formatDate(timestamp, "full");
+  }
+
+  /**
    * Gets the current Unix timestamp in seconds.
-   * @returns Current Unix timestamp
+   *
+   * @returns {number} Current Unix timestamp
+   *
+   * @example
+   * // Returns current timestamp (e.g., 1707307200)
+   * DateFormatter.getCurrentTimestamp()
    */
   static getCurrentTimestamp(): number {
     const timestamp = Math.floor(Date.now() / 1000);
@@ -55,7 +104,13 @@ export class DateFormatter {
 
   /**
    * Gets the Unix timestamp from 24 hours ago.
-   * @returns Unix timestamp from 24 hours ago
+   * Useful for querying data from the last day.
+   *
+   * @returns {number} Unix timestamp from 24 hours ago
+   *
+   * @example
+   * // Returns timestamp from 24 hours ago
+   * DateFormatter.get24HoursAgo()
    */
   static get24HoursAgo(): number {
     const timestamp = this.getCurrentTimestamp() - 24 * 60 * 60;
@@ -65,11 +120,16 @@ export class DateFormatter {
 
   /**
    * Gets the Unix timestamp from a specified number of days ago.
-   * @param days - Number of days to go back (can be fractional)
-   * @returns Unix timestamp from specified days ago
+   * Supports fractional days for more precise time ranges.
+   *
+   * @param {number} days - Number of days to go back (can be fractional)
+   * @returns {number} Unix timestamp from specified days ago
+   *
    * @example
-   * getTimeAgo(7) // returns timestamp from 7 days ago
-   * getTimeAgo(0.5) // returns timestamp from 12 hours ago
+   * // Returns timestamp from 7 days ago
+   * DateFormatter.getTimeAgo(7)
+   * // Returns timestamp from 12 hours ago
+   * DateFormatter.getTimeAgo(0.5)
    */
   static getTimeAgo(days: number): number {
     const timestamp = this.getCurrentTimestamp() - days * 24 * 60 * 60;

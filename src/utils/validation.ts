@@ -1,19 +1,65 @@
+/**
+ * @packageDocumentation
+ * Address validation utilities for Conflux eSpace.
+ * Provides functionality for validating single and multiple Conflux-style addresses.
+ * Uses cive's isAddress for validation and includes logging.
+ * @module utils/validation
+ */
+
 import { isAddress } from "cive/utils";
 import { createLogger } from "./logger";
 
 const logger = createLogger("AddressValidator");
 
+/**
+ * Utility class for validating Conflux-style addresses used in Conflux eSpace.
+ * Provides methods for validating both single addresses and arrays of addresses.
+ *
+ * @class AddressValidator
+ */
 export class AddressValidator {
+  /**
+   * Validates a single Conflux-style address.
+   * Checks if the address is a valid 40-character (excluding '0x') hexadecimal string.
+   *
+   * @param {string} address - The address to validate
+   * @returns {boolean} True if the address is valid, false otherwise
+   *
+   * @example
+   * // Returns true
+   * AddressValidator.validateAddress("0x1234567890123456789012345678901234567890")
+   * // Returns false
+   * AddressValidator.validateAddress("invalid-address")
+   */
   static validateAddress(address: string): boolean {
     const isValid = isAddress(address);
     if (!isValid) {
-      logger.error({ address }, "Invalid Core address provided");
+      logger.error({ address }, "Invalid eSpace address provided");
     } else {
       logger.debug({ address }, "Address validation successful");
     }
     return isValid;
   }
 
+  /**
+   * Validates an array of Conflux-style addresses.
+   * Checks each address in the array and returns true only if all addresses are valid.
+   *
+   * @param {string[]} addresses - Array of addresses to validate
+   * @returns {boolean} True if all addresses are valid, false if any address is invalid
+   *
+   * @example
+   * // Returns true
+   * AddressValidator.validateAddresses([
+   *   "0x1234567890123456789012345678901234567890",
+   *   "0x0987654321098765432109876543210987654321"
+   * ])
+   * // Returns false
+   * AddressValidator.validateAddresses([
+   *   "0x1234567890123456789012345678901234567890",
+   *   "invalid-address"
+   * ])
+   */
   static validateAddresses(addresses: string[]): boolean {
     logger.debug({ addressCount: addresses.length }, "Validating multiple addresses");
     const isValid = addresses.every((address) => this.validateAddress(address));
@@ -23,31 +69,5 @@ export class AddressValidator {
       logger.debug({ addresses }, "All addresses validated successfully");
     }
     return isValid;
-  }
-}
-
-/**
- * Validates if a given string is a valid Conflux address
- */
-export function isValidAddress(address: string): boolean {
-  if (!address || typeof address !== "string") {
-    return false;
-  }
-
-  // Basic Conflux address format check
-  return address.startsWith("cfx:") && address.length >= 42;
-}
-
-/**
- * Validates timestamp range parameters
- */
-export function validateTimestampRange(params: {
-  minTimestamp?: number;
-  maxTimestamp?: number;
-}): void {
-  const { minTimestamp, maxTimestamp } = params;
-
-  if (minTimestamp && maxTimestamp && minTimestamp > maxTimestamp) {
-    throw new Error("minTimestamp must be less than or equal to maxTimestamp");
   }
 }

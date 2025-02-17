@@ -1,0 +1,36 @@
+{
+  "entryPoints": [
+    "src/index.ts",
+  ],
+  "out": "docs",
+  "excludePrivate": false,
+  "excludeProtected": false,
+  "excludeExternals": false,
+  "includeVersion": true,
+  "gitRemote": "origin",
+  "gitRevision": "main",
+  "readme": "README.md",
+  "name": "@cfxdevkit/confluxscan-core",
+  "excludeReferences": false,
+  "excludeNotDocumented": false,
+  "visibilityFilters": {
+    "protected": true,
+    "private": true,
+    "inherited": true,
+    "external": true
+  },
+  "intentionallyNotExported": [],
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "categorizeByGroup": true,
+  "categoryOrder": ["Wrappers", "Core", "Types", "*"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/cfxdevkit/core-scanner"
+  },
+  "entryPointStrategy": "expand",
+  "sort": ["source-order"],
+  "theme": "default"
+} 
