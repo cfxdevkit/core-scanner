@@ -83,9 +83,9 @@ describe("UtilsModule", () => {
 
     it("should throw error for invalid inputs", async () => {
       await expect(
-        //eslint-disable-next-line @typescript-eslint/no-explicit-any
         module.decodeMethodRaw({
           contracts: "cfx:achc8nxj7r451c223m18w2dwjnmhkd6rxawrvkvsy2",
+          //eslint-disable-next-line @typescript-eslint/no-explicit-any
           inputs: undefined as any,
         })
       ).rejects.toThrow("Invalid inputs: undefined");
