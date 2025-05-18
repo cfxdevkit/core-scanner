@@ -30,8 +30,8 @@ export class CoreApi {
    * @param {string} [config.host] - Optional custom host URL
    */
   constructor({ target = "mainnet", apiKey, host }: ApiConfig = { target: "mainnet" }) {
-    const defaultMainnetHost = "https://api.confluxscan.io";
-    const defaultTestnetHost = "https://api-testnet.confluxscan.io";
+    const defaultMainnetHost = "https://api.confluxscan.org";
+    const defaultTestnetHost = "https://api-testnet.confluxscan.org";
     const defaultHost = target === "mainnet" ? defaultMainnetHost : defaultTestnetHost;
     this.baseUrl = host || defaultHost;
     this.apiKey = apiKey;
