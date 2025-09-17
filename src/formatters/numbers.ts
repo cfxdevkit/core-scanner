@@ -107,7 +107,10 @@ export class NumberFormatter {
       const formatted = formatUnits(BigInt(value), 9);
       return `${this.formatNumber(formatted)} Gdrip`;
     } catch (error) {
-      logger.error("Error formatting gas value", { module: "NumberFormatter", value, error });
+      logger.error(
+        { value, error: error instanceof Error ? error.message : String(error) },
+        "Error formatting gas value"
+      );
       return "0 Gdrip";
     }
   }
@@ -134,7 +137,10 @@ export class NumberFormatter {
       const formatted = formatCFX(BigInt(value));
       return `${this.formatNumber(formatted)}`;
     } catch (error) {
-      logger.error("Error formatting CFX value", { module: "NumberFormatter", value, error });
+      logger.error(
+        { value, error: error instanceof Error ? error.message : String(error) },
+        "Error formatting CFX value"
+      );
       return "";
     }
   }
